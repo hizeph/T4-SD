@@ -20,10 +20,10 @@ public class HeartBeat extends Thread {
 
     public HeartBeat() throws UnknownHostException, IOException {
         IP = InetAddress.getLocalHost().getHostAddress();
-        this.message = new Message("heartbeatMsg", "", IP, 2222);
+        message = new Message("heartbeatMsg", "", IP, 2222);
         groupIP = InetAddress.getByName("230.0.0.1");
-        this.multiSocket = new MulticastSocket(7777);
-        this.multiSocket.joinGroup(groupIP);
+        multiSocket = new MulticastSocket(7777);
+        multiSocket.joinGroup(groupIP);
     }
 
     private byte[] messageToByte() {
@@ -52,9 +52,10 @@ public class HeartBeat extends Thread {
         try {
             // send heartbeat
             byte[] buf = messageToByte();
-            DatagramPacket p = new DatagramPacket(buf, buf.length);
+            DatagramPacket p = new DatagramPacket(buf, buf.length, groupIP, 7777);
             while (true) {
                 multiSocket.send(p);
+                System.out.println("sent");
                 sleep(30000);
             }
         } catch (IOException ex) {
