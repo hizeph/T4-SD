@@ -18,6 +18,7 @@ public class T4SD {
         try {
             PeerController peerController = new PeerController();
             peerController.startHeartBeat();
+            peerController.stopHeartBeat();
             
         } catch (IOException ex) {
             Logger.getLogger(T4SD.class.getName()).log(Level.SEVERE, null, ex);
