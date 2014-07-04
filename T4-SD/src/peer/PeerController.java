@@ -22,6 +22,4 @@ public class PeerController {
     public void startHeartBeat(){
         heartBeat.start();
     }
-    
-    
 }

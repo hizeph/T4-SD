@@ -15,14 +15,17 @@ public class HeartBeat extends Thread {
     
     private final MulticastSocket multiSocket;
     private final InetAddress groupIP;
+    private final int groupPort = 7777;
     private final Message message;
     private final String IP;
+    private boolean stop;
 
     public HeartBeat() throws UnknownHostException, IOException {
+        stop = false;
         IP = InetAddress.getLocalHost().getHostAddress();
         message = new Message("heartbeatMsg", "", IP, 2222);
         groupIP = InetAddress.getByName("230.0.0.1");
-        multiSocket = new MulticastSocket(7777);
+        multiSocket = new MulticastSocket(groupPort);
         multiSocket.joinGroup(groupIP);
     }
 
@@ -46,18 +49,24 @@ public class HeartBeat extends Thread {
         }
         return null;
     }
+    
+    public void kill(){
+        stop = true;
+    }
 
     @Override
     public void run() {
         try {
             // send heartbeat
             byte[] buf = messageToByte();
-            DatagramPacket p = new DatagramPacket(buf, buf.length, groupIP, 7777);
-            while (true) {
+            DatagramPacket p = new DatagramPacket(buf, buf.length, groupIP, groupPort);
+            while (!stop) {
                 multiSocket.send(p);
                 System.out.println("sent");
                 sleep(30000);
             }
+            this.interrupt();
+            
         } catch (IOException ex) {
             Logger.getLogger(HeartBeat.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InterruptedException ex) {
