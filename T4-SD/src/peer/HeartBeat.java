@@ -1,6 +1,7 @@
 package peer;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.DatagramPacket;
 import message.Message;
 import java.net.UnknownHostException;

@@ -1,32 +1,48 @@
 package peer;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.UnknownHostException;
+import java.io.Serializable;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import message.Message;
 
-public class Peer implements IMember {
-    
+public class Peer implements IMember, Serializable {
+
     private Message message;
-    private final PeerController controller;
-    
-    public Peer(PeerController controller) throws UnknownHostException, IOException {
-        this.controller = controller;
-    }
-    
-    @Override
-    public void deliver(String filename, IMember[] remotePeer) 
-            throws RemoteException {
-        // search in remotePeer ( RMI - remotePeer.search() )
+    private final String hostURL = "peer";
+    private ArrayList<IMember> peerList;
+
+    public Peer()  {
     }
 
     @Override
-    public void deliver(byte[] file, String filename, IMember remotePeer) 
+    public void deliver(String filename, IMember[] remotePeer)
             throws RemoteException {
-        
+
+        byte[] file = remotePeer[0].search(filename, this);
+
+        FileOutputStream music;
+        try {
+            String path = System.getProperty("user.dir") + System.getProperty("file.separator") +  filename;
+            music = new FileOutputStream(path);
+            music.write(file, 0, file.length);
+            music.close();
+            System.out.println("Saved on: " + path);
+        } catch (IOException ex) {
+            System.out.println("!> Failed to write on disk");
+        }
+    }
+
+    @Override
+    public void deliver(byte[] file, String filename, IMember remotePeer)
+            throws RemoteException {
+        System.out.println("Delivering "+filename);
         FileOutputStream music;
         try {
             String path = System.getProperty("user.dir") + System.getProperty("file.separator") + filename;
@@ -37,17 +53,30 @@ public class Peer implements IMember {
         } catch (IOException ex) {
             System.out.println("!> Failed to write on disk");
         }
-        // controller.savePeer
     }
 
     @Override
-    public byte[] search(String filename, IMember member) 
+    public byte[] search(String filename, IMember member)
             throws RemoteException {
-        
-        // return "filename" bytes
 
-        byte b[] = null;
-        return b;
+        // return "filename" bytes
+        byte[] musicBytes = new byte[10000000];
+        byte[] output;
+        int nBytes = 0;
+        try {
+            // look in database
+            String path = System.getProperty("user.dir") + System.getProperty("file.separator") + filename;
+            FileInputStream music = new FileInputStream(path);
+            nBytes = music.read(musicBytes, 0, 10000000);
+            music.close();
+        } catch (FileNotFoundException ex) {
+            System.out.println("!> Request not found");
+        } catch (IOException ex) {
+            Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        output = Arrays.copyOf(musicBytes, nBytes);
+        return output;
     }
-    
+
 }
