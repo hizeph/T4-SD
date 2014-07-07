@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,7 +44,9 @@ public class Peer implements IMember, Serializable {
     @Override
     public void deliver(byte[] file, String filename, IMember remotePeer)
             throws RemoteException {
+        
         System.out.println("Delivering "+filename);
+        
         FileOutputStream music;
         try {
             String path = System.getProperty("user.dir") + System.getProperty("file.separator") + filename;

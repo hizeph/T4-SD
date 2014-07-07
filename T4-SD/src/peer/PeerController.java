@@ -32,8 +32,9 @@ public class PeerController extends Thread {
     private Message message;
     private final String localIP;
     private int localPort;
-    private static Peer peerLocal;
+    private Peer peerLocal;
     private IMember peer;
+    private  Registry registry;
 
     public PeerController() throws UnknownHostException, IOException {
         
@@ -50,9 +51,13 @@ public class PeerController extends Thread {
         String hostURL;
         do {
             try {
-                LocateRegistry.createRegistry(localPort);
+                if (localIP.equals("192.168.0.12")){
+                    registry = LocateRegistry.createRegistry(localPort);
+                } else {
+                    registry = LocateRegistry.getRegistry("192.168.0.12",1099);
+                }
                 hostURL = "peer_" + String.valueOf(localPort);
-                Naming.bind(hostURL, peerLocal);
+                registry.bind(hostURL, peerLocal);
                 work = true;
             } catch (ExportException ex) {
                 localPort++;
@@ -141,9 +146,9 @@ public class PeerController extends Thread {
             
             System.out.println(message.getMemberIP().getHostAddress() +":"+message.getMemberPort());
             
-            //Registry r =  LocateRegistry.getRegistry(message.getMemberIP().getHostAddress(), message.getMemberPort());
+            registry =  LocateRegistry.getRegistry(message.getMemberIP().getHostAddress(), message.getMemberPort());
             
-            peer = (IMember) Naming.lookup("rmi://" + message.getMemberIP().getHostAddress() +":"+message.getMemberPort()+"/peer_"+(message.getMemberPort()));
+            peer = (IMember) registry.lookup("rmi://" + message.getMemberIP().getHostAddress() +":"+message.getMemberPort()+"/peer_"+(message.getMemberPort()));
             peer.deliver(output, message.getFileName(), (IMember) peerLocal);
             
             
