@@ -60,6 +60,7 @@ public class PeerController extends Thread {
                 registry = LocateRegistry.createRegistry(localPort);
                 hostURL = "peer_" + String.valueOf(localPort);
                 //registry.bind(hostURL, peerLocal);
+                System.out.println("rmi://" + localIP +":"+localPort+"/peer_"+localPort);
                 Naming.bind("rmi://" + localIP +":"+localPort+"/peer_"+localPort, peerLocal);
                 work = true;
                 
