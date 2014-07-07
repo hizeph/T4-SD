@@ -11,6 +11,7 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.UnknownHostException;
+import java.rmi.AccessException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -34,7 +35,7 @@ public class PeerController extends Thread {
     private int localPort;
     private Peer peerLocal;
     private IMember peer;
-    private  Registry registry;
+    private Registry registry;
 
     public PeerController() throws UnknownHostException, IOException {
         
@@ -51,11 +52,12 @@ public class PeerController extends Thread {
         String hostURL;
         do {
             try {
-                if (localIP.equals("192.168.0.12")){
-                    registry = LocateRegistry.createRegistry(localPort);
-                } else {
-                    registry = LocateRegistry.getRegistry("192.168.0.12",1099);
-                }
+//                if (localIP.equals("192.168.0.12")){
+//                    registry = LocateRegistry.createRegistry(localPort);
+//                } else {
+//                    registry = LocateRegistry.getRegistry("192.168.0.12",1099);
+//                }
+                registry = LocateRegistry.createRegistry(localPort);
                 hostURL = "peer_" + String.valueOf(localPort);
                 registry.bind(hostURL, peerLocal);
                 work = true;
@@ -148,8 +150,9 @@ public class PeerController extends Thread {
             
             System.out.println(message.getMemberIP().getHostAddress() +":"+message.getMemberPort());
             
-            //registry =  LocateRegistry.getRegistry(message.getMemberIP().getHostAddress(), message.getMemberPort());
+            registry =  LocateRegistry.getRegistry(message.getMemberIP().getHostAddress(), message.getMemberPort());
             
+            peer = null;
             peer = (IMember) registry.lookup("rmi://" + message.getMemberIP().getHostAddress() +":"+message.getMemberPort()+"/peer_"+(message.getMemberPort()));
             peer.deliver(output, message.getFileName(), (IMember) peerLocal);
             
