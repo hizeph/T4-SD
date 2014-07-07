@@ -55,11 +55,15 @@ public class PeerController extends Thread {
                 hostURL = "peer_" + String.valueOf(localPort);
                 Naming.bind(hostURL, (IMember) peerLocal);
                 work = true;
-            } catch (AlreadyBoundException ex) {
-                ex.printStackTrace();
             } catch (ExportException ex) {
                 localPort++;
                 System.out.println("fail");
+            } catch (AlreadyBoundException ex) {
+                Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (MalformedURLException ex) {
+                Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (RemoteException ex) {
+                Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
             }
         } while (!work);
     }
@@ -139,9 +143,9 @@ public class PeerController extends Thread {
 
             output = Arrays.copyOf(musicBytes, nBytes);
             System.out.println(message.getMemberIP().getHostAddress() +":"+message.getMemberPort());
-            peer = (IMember) Naming.lookup("rmi://" + message.getMemberIP().getHostAddress() +":"+message.getMemberPort()+"/peer_"+(message.getMemberPort()));
+            peer = (IMember) Naming.lookup("rmi://" + message.getMemberIP().getHostAddress() +":"+message.getMemberPort()/*+"/peer_"+(message.getMemberPort())*/);
             
-            peer.deliver(output, message.getFileName(), (IMember) peer);
+            peer.deliver(output, message.getFileName(), (IMember) peerLocal);
             
         } catch (RemoteException ex) {
             Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
