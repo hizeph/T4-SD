@@ -59,7 +59,8 @@ public class PeerController extends Thread {
 //                }
                 registry = LocateRegistry.createRegistry(localPort);
                 hostURL = "peer_" + String.valueOf(localPort);
-                registry.bind(hostURL, peerLocal);
+                //registry.bind(hostURL, peerLocal);
+                Naming.bind(hostURL, peerLocal);
                 work = true;
                 
             } catch (ExportException ex) {
@@ -150,10 +151,10 @@ public class PeerController extends Thread {
             
             System.out.println(message.getMemberIP().getHostAddress() +":"+message.getMemberPort());
             
-            registry =  LocateRegistry.getRegistry(message.getMemberIP().getHostAddress(), message.getMemberPort());
+            //registry =  LocateRegistry.getRegistry(message.getMemberIP().getHostAddress(), message.getMemberPort());
             
             peer = null;
-            peer = (IMember) registry.lookup("rmi://" + message.getMemberIP().getHostAddress() +":"+message.getMemberPort()+"/peer_"+(message.getMemberPort()));
+            peer = (IMember) Naming.lookup("rmi://" + message.getMemberIP().getHostAddress() +":"+message.getMemberPort()+"/peer_"+(message.getMemberPort()));
             peer.deliver(output, message.getFileName(), (IMember) peerLocal);
             
             
