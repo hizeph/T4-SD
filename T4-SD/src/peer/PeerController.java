@@ -37,9 +37,11 @@ public class PeerController extends Thread {
     private IMember peer;
 
     public PeerController() throws UnknownHostException, IOException {
+        
         groupIP = InetAddress.getByName("230.0.0.1");
         multiSocket = new MulticastSocket(groupPort);
         multiSocket.joinGroup(groupIP);
+        
         heartBeat = new HeartBeat(this);
         localIP = InetAddress.getLocalHost().getHostAddress();
         localPort = Registry.REGISTRY_PORT;
@@ -105,10 +107,10 @@ public class PeerController extends Thread {
         byte[] buf = new byte[10000000];
         DatagramPacket p = new DatagramPacket(buf, buf.length);
         while (true) {
-             System.out.println("Searching Music");
+            
             try {
+                System.out.println("Searching Music");
                 multiSocket.receive(p);
-               
                 message = byteToMessage(p.getData());
                 if (message.getTypeMsg().equals("discoveryMsg")) {
                     System.out.println("Searching Music");

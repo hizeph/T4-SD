@@ -21,9 +21,10 @@ public class T4SD {
         
         try {
             PeerController peerController = new PeerController();
-            peerController.run();
+            peerController.start();
             
             while (true) {
+                System.out.println("Nome da musica:");
                 keyboard = scan.nextLine();
                 keyboard+=".mp3";
                 if (!keyboard.equals("exit")){
