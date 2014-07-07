@@ -109,13 +109,12 @@ public class PeerController extends Thread {
         while (true) {
             
             try {
-                System.out.println("Searching Music");
+                System.out.println("Waiting request");
                 multiSocket.receive(p);
                 message = byteToMessage(p.getData());
-                if (message.getMemberPort() != getLocalPort() && !message.getMemberIP().getHostAddress().equals(getLocalIP()) ){
+                if (!message.getMemberIP().getHostAddress().equals(getLocalIP()) ){
                     
                     if (message.getTypeMsg().equals("discoveryMsg")) {
-                        System.out.println("Searching Music");
                         searchMusic();
                     }
                     
