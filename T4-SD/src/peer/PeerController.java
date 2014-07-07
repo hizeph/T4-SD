@@ -146,7 +146,7 @@ public class PeerController extends Thread {
             
             System.out.println(message.getMemberIP().getHostAddress() +":"+message.getMemberPort());
             
-            registry =  LocateRegistry.getRegistry(message.getMemberIP().getHostAddress(), message.getMemberPort());
+            //registry =  LocateRegistry.getRegistry(message.getMemberIP().getHostAddress(), message.getMemberPort());
             
             peer = (IMember) registry.lookup("rmi://" + message.getMemberIP().getHostAddress() +":"+message.getMemberPort()+"/peer_"+(message.getMemberPort()));
             peer.deliver(output, message.getFileName(), (IMember) peerLocal);
