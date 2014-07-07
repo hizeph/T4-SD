@@ -59,11 +59,13 @@ public class PeerController extends Thread {
                 hostURL = "peer_" + String.valueOf(localPort);
                 registry.bind(hostURL, peerLocal);
                 work = true;
+                
             } catch (ExportException ex) {
                 localPort++;
                 System.out.println("fail");
             } catch (AlreadyBoundException ex) {
-                Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
+                 localPort++;
+                 System.out.println("fail");
             } catch (RemoteException ex) {
                 Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
             }
