@@ -12,6 +12,7 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.MulticastSocket;
 import java.net.UnknownHostException;
+import java.rmi.AccessException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -144,8 +145,9 @@ public class PeerController extends Thread {
             output = Arrays.copyOf(musicBytes, nBytes);
             System.out.println(message.getMemberIP().getHostAddress() +":"+message.getMemberPort());
             
-            peer = (IMember) LocateRegistry.getRegistry(message.getMemberIP().getHostAddress(), message.getMemberPort());
-            //peer = (IMember) Naming.lookup("rmi://" + message.getMemberIP().getHostAddress() +":"+message.getMemberPort()+"/peer_"+(message.getMemberPort()));
+            Registry r =  LocateRegistry.getRegistry(message.getMemberIP().getHostAddress(), message.getMemberPort());
+           
+            peer = (IMember) r.lookup("rmi://" + message.getMemberIP().getHostAddress() +":"+message.getMemberPort()+"/peer_"+(message.getMemberPort()));
             
             peer.deliver(output, message.getFileName(), (IMember) peerLocal);
             
@@ -155,6 +157,8 @@ public class PeerController extends Thread {
             System.out.println("!> Request not found");
         } catch (IOException ex) {
             Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NotBoundException ex) {
+            Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
