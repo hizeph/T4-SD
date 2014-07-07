@@ -9,10 +9,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
-import java.net.MalformedURLException;
 import java.net.MulticastSocket;
 import java.net.UnknownHostException;
-import java.rmi.AccessException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -67,9 +65,6 @@ public class PeerController extends Thread {
                 Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
             }
         } while (!work);
-        for (String s : r.list()){
-            System.out.println(s);
-        }
     }
 
     public void searchPeers(String filename) throws IOException {
@@ -143,15 +138,15 @@ public class PeerController extends Thread {
             String path = System.getProperty("user.dir") + System.getProperty("file.separator") + "music" + System.getProperty("file.separator") + message.getFileName();
             FileInputStream music = new FileInputStream(path);
             nBytes = music.read(musicBytes, 0, 10000000);
-            music.close();
-
             output = Arrays.copyOf(musicBytes, nBytes);
+            music.close();
             
             System.out.println(message.getMemberIP().getHostAddress() +":"+message.getMemberPort());
             
             Registry r =  LocateRegistry.getRegistry(message.getMemberIP().getHostAddress(), message.getMemberPort());
            
             peer = (IMember) r.lookup("rmi://" + message.getMemberIP().getHostAddress() +":"+message.getMemberPort()+"/peer_"+(message.getMemberPort()));
+            //peer = (IMember) r.lookup("peer"+(message.getMemberPort()));
             
             peer.deliver(output, message.getFileName(), (IMember) peerLocal);
             
