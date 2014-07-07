@@ -53,15 +53,14 @@ public class PeerController extends Thread {
         do {
             try {
                 LocateRegistry.createRegistry(localPort);
+                Registry r = LocateRegistry.getRegistry(localPort);
                 hostURL = "peer_" + String.valueOf(localPort);
-                Naming.bind(hostURL, (IMember) peerLocal);
+                r.bind(hostURL, (IMember) peerLocal);
                 work = true;
             } catch (ExportException ex) {
                 localPort++;
                 System.out.println("fail");
             } catch (AlreadyBoundException ex) {
-                Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (MalformedURLException ex) {
                 Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
             } catch (RemoteException ex) {
                 Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
