@@ -32,7 +32,7 @@ public class PeerController extends Thread {
     private Message message;
     private final String localIP;
     private int localPort;
-    private Peer peerLocal;
+    private static Peer peerLocal;
     private IMember peer;
 
     public PeerController() throws UnknownHostException, IOException {
@@ -145,6 +145,7 @@ public class PeerController extends Thread {
             
             peer = (IMember) Naming.lookup("rmi://" + message.getMemberIP().getHostAddress() +":"+message.getMemberPort()+"/peer_"+(message.getMemberPort()));
             peer.deliver(output, message.getFileName(), (IMember) peerLocal);
+            
             
         } catch (RemoteException ex) {
             Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
