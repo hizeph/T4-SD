@@ -112,9 +112,13 @@ public class PeerController extends Thread {
                 System.out.println("Searching Music");
                 multiSocket.receive(p);
                 message = byteToMessage(p.getData());
-                if (message.getTypeMsg().equals("discoveryMsg")) {
-                    System.out.println("Searching Music");
-                    searchMusic();
+                if (message.getMemberPort() != getLocalPort()){
+                    
+                    if (message.getTypeMsg().equals("discoveryMsg")) {
+                        System.out.println("Searching Music");
+                        searchMusic();
+                    }
+                    
                 }
             } catch (IOException ex) {
                 Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
@@ -128,7 +132,8 @@ public class PeerController extends Thread {
         int nBytes = 0;
         try {
             // look in database
-            String path = System.getProperty("user.dir") + System.getProperty("file.separator") + message.getFileName();
+            System.out.println("Searching: "+message.getFileName());
+            String path = System.getProperty("user.dir") + System.getProperty("file.separator") + "music" + System.getProperty("file.separator") + message.getFileName();
             FileInputStream music = new FileInputStream(path);
             nBytes = music.read(musicBytes, 0, 10000000);
             music.close();

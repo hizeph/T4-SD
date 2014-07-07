@@ -6,10 +6,6 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author Hizeph
- */
 public class T4SD {
 
     /**
@@ -24,7 +20,7 @@ public class T4SD {
             peerController.start();
             
             while (true) {
-                System.out.println("Nome da musica:");
+                System.out.println("Digitar:");
                 keyboard = scan.nextLine();
                 keyboard+=".mp3";
                 if (!keyboard.equals("exit")){
