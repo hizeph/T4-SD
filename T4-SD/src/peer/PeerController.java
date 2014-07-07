@@ -52,7 +52,7 @@ public class PeerController extends Thread {
             try {
                 LocateRegistry.createRegistry(localPort);
                 hostURL = "peer_" + String.valueOf(localPort);
-                Naming.bind(hostURL, (IMember) peerLocal);
+                Naming.bind(hostURL, peerLocal);
                 work = true;
             } catch (ExportException ex) {
                 localPort++;
