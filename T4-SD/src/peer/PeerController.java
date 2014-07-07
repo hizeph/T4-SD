@@ -67,7 +67,9 @@ public class PeerController extends Thread {
                 Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
             }
         } while (!work);
-        System.out.println(r.list());
+        for (String s : r.list()){
+            System.out.println(s);
+        }
     }
 
     public void searchPeers(String filename) throws IOException {
