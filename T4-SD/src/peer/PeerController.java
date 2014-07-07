@@ -138,7 +138,8 @@ public class PeerController extends Thread {
             music.close();
 
             output = Arrays.copyOf(musicBytes, nBytes);
-            peer = (IMember) Naming.lookup("peer_"+String.valueOf(message.getMemberPort()));
+            peer = (IMember) Naming.lookup("rmi://" + message.getMemberIP().getHostAddress() +":"+message.getMemberPort()+"/peer_"+(message.getMemberPort()));
+            
             peer.deliver(output, message.getFileName(), (IMember) peer);
             
         } catch (RemoteException ex) {
