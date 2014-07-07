@@ -50,10 +50,11 @@ public class PeerController extends Thread {
 
         boolean work = false;
         String hostURL;
+        Registry r = null;
         do {
             try {
                 LocateRegistry.createRegistry(localPort);
-                Registry r = LocateRegistry.getRegistry(localPort);
+                r = LocateRegistry.getRegistry(localPort);
                 hostURL = "peer_" + String.valueOf(localPort);
                 r.bind(hostURL, (IMember) peerLocal);
                 work = true;
@@ -66,6 +67,7 @@ public class PeerController extends Thread {
                 Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
             }
         } while (!work);
+        System.out.println(r.list());
     }
 
     public void searchPeers(String filename) throws IOException {
@@ -142,6 +144,7 @@ public class PeerController extends Thread {
             music.close();
 
             output = Arrays.copyOf(musicBytes, nBytes);
+            
             System.out.println(message.getMemberIP().getHostAddress() +":"+message.getMemberPort());
             
             Registry r =  LocateRegistry.getRegistry(message.getMemberIP().getHostAddress(), message.getMemberPort());
