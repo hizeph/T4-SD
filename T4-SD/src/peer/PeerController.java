@@ -72,6 +72,13 @@ public class PeerController extends Thread {
         // **************************************    
         // search ArrayList of saved peers before
         // **************************************
+        int i;
+        for(i=0;i<peerLocal.musicList.size();i++){
+            if(peerLocal.musicList.get(i).equals(filename)){
+                System.out.println("Encontrada referëncia, enviar o rmi");
+            }
+        }
+        
         Message message = new Message("discoveryMsg", filename, getLocalIP(), getLocalPort());
         byte[] buf = messageToByte(message);
         DatagramPacket p = new DatagramPacket(buf, buf.length, getGroupIP(), getGroupPort());

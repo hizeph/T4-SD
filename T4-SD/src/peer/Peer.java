@@ -17,10 +17,11 @@ public class Peer extends UnicastRemoteObject implements IMember, Serializable {
 
     private Message message;
     private final String hostURL = "peer";
-    private ArrayList<IMember> peerList;
-    private ArrayList<String> musicList;
+    public ArrayList<IMember> peerList;
+    public ArrayList<String> musicList;
     public Peer() throws RemoteException {
-        
+        peerList = new ArrayList<IMember>();
+        musicList = new ArrayList<String>();
     }
 
     @Override
@@ -44,9 +45,11 @@ public class Peer extends UnicastRemoteObject implements IMember, Serializable {
     @Override
     public void deliver(byte[] file, String filename, IMember remotePeer)
             throws RemoteException {
-        
         System.out.println("Delivering "+filename);
         
+        musicList.add(filename);
+        peerList.add(remotePeer);
+        System.out.println("Adicionado no historico");
         
         
         FileOutputStream music;
