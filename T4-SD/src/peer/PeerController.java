@@ -114,7 +114,7 @@ public class PeerController extends Thread {
             
             try {
                 System.out.println("Waiting request");
-                multiSocket.receive(p);
+                multiSocket.receive(p);//fica aguardando requisição. outra thread do peer permite a ele requisitar arquivos
                 message = byteToMessage(p.getData());
                 if (!message.getMemberIP().getHostAddress().equals(getLocalIP()) ){
                     
