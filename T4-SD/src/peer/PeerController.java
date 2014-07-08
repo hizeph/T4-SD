@@ -12,7 +12,6 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.MulticastSocket;
 import java.net.UnknownHostException;
-import java.rmi.AccessException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -139,19 +138,14 @@ public class PeerController extends Thread {
 
                             try {
                                 peer = (IMember) Naming.lookup("rmi://" + message.getMemberIP().getHostAddress() + ":" + message.getMemberPort() + "/peer_" + (message.getMemberPort()));
-                            } catch (NotBoundException ex) {
-                                Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
-                            } catch (MalformedURLException ex) {
-                                Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
-                            } catch (RemoteException ex) {
+                                peer.deliver(message.getFileName(), list);
+                            } catch (NotBoundException | MalformedURLException | RemoteException ex) {
                                 Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
                             }
-                            peer.deliver(message.getFileName(), list);
                         } else {
                             searchMusic();
                         }
                     }
-
                 }
             } catch (IOException ex) {
                 Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);

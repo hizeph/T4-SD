@@ -29,21 +29,21 @@ public class Peer extends UnicastRemoteObject implements IMember, Serializable {
     public void deliver(String filename, IMember[] remotePeer)
             throws RemoteException {
         System.out.println("CHAMOU DELIVER CORRETO");
-        //byte[] file = remotePeer[0].search(filename, this);
-        //remotepeer.search
         byte[] file = new byte[10000000];
         for (IMember i : remotePeer) {
-            file=i.search(filename, this);
-            FileOutputStream music;
-            try {
-                String path = System.getProperty("user.dir") + System.getProperty("file.separator") + filename;
-                music = new FileOutputStream(path);
-                music.write(file, 0, file.length);
-                music.close();
-                System.out.println("Saved on: " + path);
-                break;
-            } catch (IOException ex) {
-                System.out.println("!> Failed to write on disk");
+            file = i.search(filename, this);
+            if (file != null){
+                FileOutputStream music;
+                try {
+                    String path = System.getProperty("user.dir") + System.getProperty("file.separator") + filename;
+                    music = new FileOutputStream(path);
+                    music.write(file, 0, file.length);
+                    music.close();
+                    System.out.println("Saved on: " + path);
+                    break;
+                } catch (IOException ex) {
+                    System.out.println("!> Failed to write on disk");
+                }
             }
         }
     }
@@ -85,6 +85,7 @@ public class Peer extends UnicastRemoteObject implements IMember, Serializable {
             music.close();
         } catch (FileNotFoundException ex) {
             System.out.println("!> Request not found");
+            return null;
         } catch (IOException ex) {
             Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ex);
         }
