@@ -9,6 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.MulticastSocket;
 import java.net.UnknownHostException;
 import java.rmi.AccessException;
@@ -19,6 +20,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.ExportException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,11 +39,11 @@ public class PeerController extends Thread {
     private IMember peer;
 
     public PeerController() throws UnknownHostException, IOException {
-        
+
         groupIP = InetAddress.getByName("230.0.0.1");
         multiSocket = new MulticastSocket(groupPort);
         multiSocket.joinGroup(groupIP);
-        
+
         heartBeat = new HeartBeat(this);
         localIP = InetAddress.getLocalHost().getHostAddress();
         localPort = Registry.REGISTRY_PORT;
@@ -53,15 +55,15 @@ public class PeerController extends Thread {
             try {
                 LocateRegistry.createRegistry(localPort);
                 hostURL = "peer_" + String.valueOf(localPort);
-                Naming.bind("rmi://" + localIP +":"+localPort+"/peer_"+localPort, peerLocal);
+                Naming.bind("rmi://" + localIP + ":" + localPort + "/peer_" + localPort, peerLocal);
                 work = true;
-                
+
             } catch (ExportException ex) {
                 localPort++;
                 System.out.println("fail");
             } catch (AlreadyBoundException ex) {
-                 localPort++;
-                 System.out.println("fail");
+                localPort++;
+                System.out.println("fail");
             } catch (RemoteException ex) {
                 Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -72,13 +74,7 @@ public class PeerController extends Thread {
         // **************************************    
         // search ArrayList of saved peers before
         // **************************************
-        int i;
-        for(i=0;i<peerLocal.musicList.size();i++){
-            if(peerLocal.musicList.get(i).equals(filename)){
-                System.out.println("Encontrada referëncia, enviar o rmi");
-            }
-        }
-        
+
         Message message = new Message("discoveryMsg", filename, getLocalIP(), getLocalPort());
         byte[] buf = messageToByte(message);
         DatagramPacket p = new DatagramPacket(buf, buf.length, getGroupIP(), getGroupPort());
@@ -118,17 +114,39 @@ public class PeerController extends Thread {
         byte[] buf = new byte[10000000];
         DatagramPacket p = new DatagramPacket(buf, buf.length);
         while (true) {
-            
+
             try {
                 System.out.println("Waiting request");
                 multiSocket.receive(p);//fica aguardando requisição. outra thread do peer permite a ele requisitar arquivos
                 message = byteToMessage(p.getData());
-                if (!message.getMemberIP().getHostAddress().equals(getLocalIP()) ){
-                    
+                if (!message.getMemberIP().getHostAddress().equals(getLocalIP())) {
+
                     if (message.getTypeMsg().equals("discoveryMsg")) {
+                        /*Verifica se tem no historico algum peer que contenha a musica*/
+                        ArrayList<IMember> lista_members = new ArrayList<IMember>();
+                        //IMember lista_members[];
+                        int i;
+                        for (i = 0; i < peerLocal.musicList.size(); i++) {
+                            if (peerLocal.musicList.get(i).equals(message.getFileName())) {
+                                System.out.println("Encontrada referëncia, enviar o rmi");
+                                try {
+                                    lista_members.add((IMember) Naming.lookup("rmi://" + message.getMemberIP().getHostAddress() + ":" + message.getMemberPort() + "/peer_" + (message.getMemberPort())));
+                                    //lista_members.
+                                    peer.deliver(message.getFileName(), (IMember[])lista_members.toArray());
+                                } catch (NotBoundException ex) {
+                                    Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
+                                } catch (MalformedURLException ex) {
+                                    Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
+                                } catch (RemoteException ex) {
+                                    Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+            
+                            }
+                        }
+
                         searchMusic();
                     }
-                    
+
                 }
             } catch (IOException ex) {
                 Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
@@ -142,16 +160,16 @@ public class PeerController extends Thread {
         int nBytes = 0;
         try {
             // look in database
-            System.out.println("Searching: "+message.getFileName());
+            System.out.println("Searching: " + message.getFileName());
             String path = System.getProperty("user.dir") + System.getProperty("file.separator") + "music" + System.getProperty("file.separator") + message.getFileName();
             FileInputStream music = new FileInputStream(path);
             nBytes = music.read(musicBytes, 0, 10000000);
             output = Arrays.copyOf(musicBytes, nBytes);
             music.close();
-            
-            peer = (IMember) Naming.lookup("rmi://" + message.getMemberIP().getHostAddress() +":"+message.getMemberPort()+"/peer_"+(message.getMemberPort()));
+
+            peer = (IMember) Naming.lookup("rmi://" + message.getMemberIP().getHostAddress() + ":" + message.getMemberPort() + "/peer_" + (message.getMemberPort()));
             peer.deliver(output, message.getFileName(), (IMember) peerLocal);
-                
+
         } catch (RemoteException ex) {
             Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (FileNotFoundException ex) {

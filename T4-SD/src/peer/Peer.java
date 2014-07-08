@@ -27,7 +27,7 @@ public class Peer extends UnicastRemoteObject implements IMember, Serializable {
     @Override
     public void deliver(String filename, IMember[] remotePeer)
             throws RemoteException {
-
+        System.out.println("CHAMOU DELIVER CORRETO");
         byte[] file = remotePeer[0].search(filename, this);
 
         FileOutputStream music;
