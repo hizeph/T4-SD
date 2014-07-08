@@ -44,9 +44,6 @@ public class Peer extends UnicastRemoteObject implements IMember, Serializable {
     @Override
     public void deliver(byte[] file, String filename, IMember remotePeer)
             throws RemoteException {
-        peerList.add(remotePeer);
-        musicList.add(filename);
-        System.out.println("Add nova musica "+filename+" e novo peer");
         
         System.out.println("Delivering "+filename);
         
