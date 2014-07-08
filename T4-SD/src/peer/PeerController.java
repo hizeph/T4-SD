@@ -124,27 +124,32 @@ public class PeerController extends Thread {
                     if (message.getTypeMsg().equals("discoveryMsg")) {
                         /*Verifica se tem no historico algum peer que contenha a musica*/
                         ArrayList<IMember> lista_members = new ArrayList<IMember>();
-                        //IMember lista_members[];
                         int i;
                         for (i = 0; i < peerLocal.musicList.size(); i++) {
                             if (peerLocal.musicList.get(i).equals(message.getFileName())) {
                                 System.out.println("Encontrada referëncia, enviar o rmi");
-                                try {
-                                    lista_members.add((IMember) Naming.lookup("rmi://" + message.getMemberIP().getHostAddress() + ":" + message.getMemberPort() + "/peer_" + (message.getMemberPort())));
-                                    //lista_members.
-                                    peer.deliver(message.getFileName(), (IMember[])lista_members.toArray());
-                                } catch (NotBoundException ex) {
-                                    Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
-                                } catch (MalformedURLException ex) {
-                                    Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
-                                } catch (RemoteException ex) {
-                                    Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-            
+                                lista_members.add(peerLocal.peerList.get(i));
                             }
                         }
+                        if (lista_members.size() > 0) {
+                            IMember[] list = new IMember[lista_members.size()];
+                            for (i = 0; i < lista_members.size(); i++) {
+                                list[i] = lista_members.get(i);
+                            }
 
-                        searchMusic();
+                            try {
+                                peer = (IMember) Naming.lookup("rmi://" + message.getMemberIP().getHostAddress() + ":" + message.getMemberPort() + "/peer_" + (message.getMemberPort()));
+                            } catch (NotBoundException ex) {
+                                Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (MalformedURLException ex) {
+                                Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (RemoteException ex) {
+                                Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                            peer.deliver(message.getFileName(), list);
+                        } else {
+                            searchMusic();
+                        }
                     }
 
                 }
