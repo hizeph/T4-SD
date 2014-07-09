@@ -30,8 +30,7 @@ public class HeartBeat extends Thread {
             DatagramPacket p = new DatagramPacket(buf, buf.length, controller.getGroupIP(), controller.getGroupPort());
              while (true) {
                 multiSocket.send(p);
-                System.out.println("sent");
-                sleep(5000);
+                sleep(30000);
             }
             
         } catch (IOException ex) {

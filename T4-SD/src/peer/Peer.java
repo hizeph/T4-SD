@@ -27,7 +27,6 @@ public class Peer extends UnicastRemoteObject implements IMember, Serializable {
     @Override
     public void deliver(String filename, IMember[] remotePeer)
             throws RemoteException {
-        System.out.println("CHAMOU DELIVER CORRETO");
 
         if (System.currentTimeMillis() > timestamp) {
 
@@ -38,7 +37,7 @@ public class Peer extends UnicastRemoteObject implements IMember, Serializable {
                 file = i.search(filename, this);
                 if (file != null) {
                     
-                    System.out.println("Adicionado no historico");
+                    //System.out.println("Adicionado no historico");
                     musicList.add(filename);
                     peerList.add(i);
                     
@@ -64,12 +63,12 @@ public class Peer extends UnicastRemoteObject implements IMember, Serializable {
         
         musicList.add(filename);
         peerList.add(remotePeer);
-        System.out.println("Adicionado no historico");
+        //System.out.println("Adicionado no historico");
 
         if (System.currentTimeMillis() > timestamp) {
             timestamp = System.currentTimeMillis() + 5000;
             
-            System.out.println("Delivering " + filename);
+            System.out.println("Receiving " + filename);
 
             FileOutputStream music;
             try {
@@ -79,7 +78,7 @@ public class Peer extends UnicastRemoteObject implements IMember, Serializable {
                 music.close();
                 System.out.println("Saved on: " + path);
             } catch (IOException ex) {
-                System.out.println("!> Failed to write on disk");
+                System.out.println("! Failed to write on disk");
             }
         }
     }
@@ -99,7 +98,7 @@ public class Peer extends UnicastRemoteObject implements IMember, Serializable {
             nBytes = music.read(musicBytes, 0, 10000000);
             music.close();
         } catch (FileNotFoundException ex) {
-            System.out.println("!> Request not found");
+            // System.out.println("!> Request not found");
             return null;
         } catch (IOException ex) {
             Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ex);

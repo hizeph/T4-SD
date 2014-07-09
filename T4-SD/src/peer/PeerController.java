@@ -118,18 +118,18 @@ public class PeerController extends Thread {
 
                     if (message.getTypeMsg().equals("discoveryMsg")) {
                         /*Verifica se tem no historico algum peer que contenha a musica*/
-                        ArrayList<IMember> lista_members = new ArrayList<IMember>();
+                        ArrayList<IMember> listMembers = new ArrayList<IMember>();
                         int i;
                         for (i = 0; i < peerLocal.musicList.size(); i++) {
                             if (peerLocal.musicList.get(i).equals(message.getFileName())) {
-                                System.out.println("Encontrada referëncia, enviar o rmi");
-                                lista_members.add(peerLocal.peerList.get(i));
+                                //System.out.println("Encontrada referëncia, enviar o rmi");
+                                listMembers.add(peerLocal.peerList.get(i));
                             }
                         }
-                        if (lista_members.size() > 0) {
-                            IMember[] list = new IMember[lista_members.size()];
-                            for (i = 0; i < lista_members.size(); i++) {
-                                list[i] = lista_members.get(i);
+                        if (listMembers.size() > 0) {
+                            IMember[] list = new IMember[listMembers.size()];
+                            for (i = 0; i < listMembers.size(); i++) {
+                                list[i] = listMembers.get(i);
                             }
 
                             try {
@@ -141,6 +141,8 @@ public class PeerController extends Thread {
                         } else {
                             searchMusic();
                         }
+                    } else { // HeartBeat message
+                        
                     }
                 }
             } catch (IOException ex) {
@@ -168,7 +170,7 @@ public class PeerController extends Thread {
         } catch (RemoteException ex) {
             Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (FileNotFoundException ex) {
-            System.out.println("!> Request not found");
+            System.out.println("! Request not found");
         } catch (IOException ex) {
             Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NotBoundException ex) {

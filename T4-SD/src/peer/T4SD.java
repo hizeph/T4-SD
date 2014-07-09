@@ -17,13 +17,13 @@ public class T4SD {
             peerController.start();
             
             while (true) {
-                System.out.println("Digitar:");
+                System.out.println("Nome da Música (sem extensão):");
                 keyboard = scan.nextLine();
                 if (!keyboard.equals("exit")){
                     keyboard+=".mp3";
                    peerController.searchPeers(keyboard);
                 } else {
-                    System.out.println("> Client closing");
+                    System.out.println("! Fechando Peer");
                     peerController.stopHeartBeat();
                     peerController.interrupt();
                     System.exit(1);
