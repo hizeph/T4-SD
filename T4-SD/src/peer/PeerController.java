@@ -47,7 +47,7 @@ public class PeerController extends Thread {
         localIP = InetAddress.getLocalHost().getHostAddress();
         localPort = Registry.REGISTRY_PORT;
         peerLocal = new Peer();
-
+        
         boolean work = false;
         String hostURL;
         do {
@@ -70,10 +70,6 @@ public class PeerController extends Thread {
     }
 
     public void searchPeers(String filename) throws IOException {
-        // **************************************    
-        // search ArrayList of saved peers before
-        // **************************************
-
         Message message = new Message("discoveryMsg", filename, getLocalIP(), getLocalPort());
         byte[] buf = messageToByte(message);
         DatagramPacket p = new DatagramPacket(buf, buf.length, getGroupIP(), getGroupPort());
@@ -85,7 +81,7 @@ public class PeerController extends Thread {
     }
 
     public void stopHeartBeat() {
-        heartBeat.kill();
+        heartBeat.interrupt();
     }
 
     public String getLocalIP() {
@@ -107,16 +103,16 @@ public class PeerController extends Thread {
     public MulticastSocket getMulticastSocket() {
         return multiSocket;
     }
-
+    
+    
     @Override
     public void run() {
         byte[] buf = new byte[10000000];
         DatagramPacket p = new DatagramPacket(buf, buf.length);
         while (true) {
-
             try {
                 System.out.println("Waiting request");
-                multiSocket.receive(p);//fica aguardando requisição. outra thread do peer permite a ele requisitar arquivos
+                multiSocket.receive(p);// fica aguardando requisição. outra thread do peer permite a ele requisitar arquivos
                 message = byteToMessage(p.getData());
                 if (!message.getMemberIP().getHostAddress().equals(getLocalIP())) {
 
@@ -137,7 +133,7 @@ public class PeerController extends Thread {
                             }
 
                             try {
-                                peer = (IMember) Naming.lookup("rmi://" + message.getMemberIP().getHostAddress() + ":" + message.getMemberPort() + "/peer_" + (message.getMemberPort()));
+                                peer = (IMember) Naming.lookup("rmi://"+message.getMemberIP().getHostAddress()+":"+message.getMemberPort()+"/peer_"+(message.getMemberPort()));
                                 peer.deliver(message.getFileName(), list);
                             } catch (NotBoundException | MalformedURLException | RemoteException ex) {
                                 Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
@@ -168,7 +164,7 @@ public class PeerController extends Thread {
 
             peer = (IMember) Naming.lookup("rmi://" + message.getMemberIP().getHostAddress() + ":" + message.getMemberPort() + "/peer_" + (message.getMemberPort()));
             peer.deliver(output, message.getFileName(), (IMember) peerLocal);
-
+            heartBeat.start();
         } catch (RemoteException ex) {
             Logger.getLogger(PeerController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (FileNotFoundException ex) {

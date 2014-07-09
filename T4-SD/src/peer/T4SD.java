@@ -8,9 +8,6 @@ import java.util.logging.Logger;
 
 public class T4SD {
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String[] args) {
         Scanner scan = new Scanner(System.in);
         String keyboard = "";
@@ -22,11 +19,13 @@ public class T4SD {
             while (true) {
                 System.out.println("Digitar:");
                 keyboard = scan.nextLine();
-                keyboard+=".mp3";
                 if (!keyboard.equals("exit")){
+                    keyboard+=".mp3";
                    peerController.searchPeers(keyboard);
                 } else {
                     System.out.println("> Client closing");
+                    peerController.stopHeartBeat();
+                    peerController.interrupt();
                     System.exit(1);
                 }
             }

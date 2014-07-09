@@ -19,30 +19,41 @@ public class Peer extends UnicastRemoteObject implements IMember, Serializable {
     private final String hostURL = "peer";
     public ArrayList<IMember> peerList;
     public ArrayList<String> musicList;
+    private double timestamp;
 
     public Peer() throws RemoteException {
         peerList = new ArrayList<IMember>();
         musicList = new ArrayList<String>();
+        timestamp = System.currentTimeMillis();
     }
 
     @Override
     public void deliver(String filename, IMember[] remotePeer)
             throws RemoteException {
         System.out.println("CHAMOU DELIVER CORRETO");
-        byte[] file = new byte[10000000];
-        for (IMember i : remotePeer) {
-            file = i.search(filename, this);
-            if (file != null){
-                FileOutputStream music;
-                try {
-                    String path = System.getProperty("user.dir") + System.getProperty("file.separator") + filename;
-                    music = new FileOutputStream(path);
-                    music.write(file, 0, file.length);
-                    music.close();
-                    System.out.println("Saved on: " + path);
-                    break;
-                } catch (IOException ex) {
-                    System.out.println("!> Failed to write on disk");
+
+        if (System.currentTimeMillis() > timestamp) {
+
+            timestamp = System.currentTimeMillis() + 5000;
+
+            byte[] file = new byte[10000000];
+            for (IMember i : remotePeer) {
+                file = i.search(filename, this);
+                if (file != null) {
+                    System.out.println("Adicionado no historico");
+                    musicList.add(filename);
+                    peerList.add(i);
+                    FileOutputStream music;
+                    try {
+                        String path = System.getProperty("user.dir") + System.getProperty("file.separator") + filename;
+                        music = new FileOutputStream(path);
+                        music.write(file, 0, file.length);
+                        music.close();
+                        System.out.println("Saved on: " + path);
+                        break;
+                    } catch (IOException ex) {
+                        System.out.println("!> Failed to write on disk");
+                    }
                 }
             }
         }
@@ -51,21 +62,25 @@ public class Peer extends UnicastRemoteObject implements IMember, Serializable {
     @Override
     public void deliver(byte[] file, String filename, IMember remotePeer)
             throws RemoteException {
-        System.out.println("Delivering " + filename);
 
-        musicList.add(filename);
-        peerList.add(remotePeer);
-        System.out.println("Adicionado no historico");
+        if (System.currentTimeMillis() > timestamp) {
+            timestamp = System.currentTimeMillis() + 5000;
+            System.out.println("Delivering " + filename);
 
-        FileOutputStream music;
-        try {
-            String path = System.getProperty("user.dir") + System.getProperty("file.separator") + filename;
-            music = new FileOutputStream(path);
-            music.write(file, 0, file.length);
-            music.close();
-            System.out.println("Saved on: " + path);
-        } catch (IOException ex) {
-            System.out.println("!> Failed to write on disk");
+            musicList.add(filename);
+            peerList.add(remotePeer);
+            System.out.println("Adicionado no historico");
+
+            FileOutputStream music;
+            try {
+                String path = System.getProperty("user.dir") + System.getProperty("file.separator") + filename;
+                music = new FileOutputStream(path);
+                music.write(file, 0, file.length);
+                music.close();
+                System.out.println("Saved on: " + path);
+            } catch (IOException ex) {
+                System.out.println("!> Failed to write on disk");
+            }
         }
     }
 
