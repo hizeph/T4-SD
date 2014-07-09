@@ -111,7 +111,7 @@ public class PeerController extends Thread {
         DatagramPacket p = new DatagramPacket(buf, buf.length);
         while (true) {
             try {
-                System.out.println("Waiting request");
+                //System.out.println("Waiting request");
                 multiSocket.receive(p);// fica aguardando requisição. outra thread do peer permite a ele requisitar arquivos
                 message = byteToMessage(p.getData());
                 if (!message.getMemberIP().getHostAddress().equals(getLocalIP())) {

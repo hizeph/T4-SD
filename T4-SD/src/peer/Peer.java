@@ -11,19 +11,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import message.Message;
 
 public class Peer extends UnicastRemoteObject implements IMember, Serializable {
 
-    private Message message;
-    private final String hostURL = "peer";
     public ArrayList<IMember> peerList;
     public ArrayList<String> musicList;
     private double timestamp;
 
     public Peer() throws RemoteException {
-        peerList = new ArrayList<IMember>();
-        musicList = new ArrayList<String>();
+        peerList = new ArrayList<>();
+        musicList = new ArrayList<>();
         timestamp = System.currentTimeMillis();
     }
 
@@ -40,9 +37,11 @@ public class Peer extends UnicastRemoteObject implements IMember, Serializable {
             for (IMember i : remotePeer) {
                 file = i.search(filename, this);
                 if (file != null) {
+                    
                     System.out.println("Adicionado no historico");
                     musicList.add(filename);
                     peerList.add(i);
+                    
                     FileOutputStream music;
                     try {
                         String path = System.getProperty("user.dir") + System.getProperty("file.separator") + filename;
@@ -62,14 +61,15 @@ public class Peer extends UnicastRemoteObject implements IMember, Serializable {
     @Override
     public void deliver(byte[] file, String filename, IMember remotePeer)
             throws RemoteException {
+        
+        musicList.add(filename);
+        peerList.add(remotePeer);
+        System.out.println("Adicionado no historico");
 
         if (System.currentTimeMillis() > timestamp) {
             timestamp = System.currentTimeMillis() + 5000;
+            
             System.out.println("Delivering " + filename);
-
-            musicList.add(filename);
-            peerList.add(remotePeer);
-            System.out.println("Adicionado no historico");
 
             FileOutputStream music;
             try {
